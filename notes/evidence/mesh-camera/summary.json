@@ -1,0 +1,389 @@
+{
+  "schema_version": 1,
+  "generated_utc": "2026-10-01T07:17:25.595600+00:00",
+  "purpose": "CPU qualitative mesh-to-camera projection and artifact linkage; not a benchmark result.",
+  "mesh": "/mnt/e/pgsr/outputs/truck-densify1500/ours_1500/fuse_post.ply",
+  "dataset": "/mnt/e/pgsr/data/truck-320",
+  "run_directory": "/mnt/e/pgsr/outputs/truck-densify1500/ours_1500",
+  "projection": {
+    "source_pose": "COLMAP images.bin qvec/tvec, x_camera = R_world_to_camera @ x_world + t",
+    "intrinsics": "COLMAP PINHOLE or SIMPLE_PINHOLE K; distorted camera models are rejected",
+    "camera_axes": "+x right, +y down, +z forward",
+    "raycast": "Open3D RaycastingScene on CPU; unit-length world rays",
+    "vertex_color": "interpolate PLY vertex RGB with Open3D primitive_uvs barycentric weights",
+    "depth": "camera-frame Z in mesh world units; misses are NaN in NPY",
+    "world_points": "hit locations in COLMAP world coordinates; misses are NaN"
+  },
+  "mesh_vertices": 455965,
+  "mesh_triangles": 819553,
+  "process_peak_rss_mb": 616.42578125,
+  "views": [
+    {
+      "colmap_image": "000001.jpg",
+      "colmap_image_id": 1,
+      "colmap_camera_id": 1,
+      "camera_model": "PINHOLE",
+      "resolution": [
+        320,
+        178
+      ],
+      "K": [
+        [
+          190.21027745001294,
+          0.0,
+          160.0
+        ],
+        [
+          0.0,
+          188.65069852237843,
+          89.0
+        ],
+        [
+          0.0,
+          0.0,
+          1.0
+        ]
+      ],
+      "world_to_camera_R": [
+        [
+          0.7861880261556364,
+          -0.028784446228571188,
+          0.6173166474223895
+        ],
+        [
+          -0.016442044149287502,
+          0.9975867826238478,
+          0.06745569151963769
+        ],
+        [
+          -0.6177686028875999,
+          -0.06318280453979654,
+          0.783817508414292
+        ]
+      ],
+      "world_to_camera_t": [
+        -1.2332419965163368,
+        -0.4709075888152064,
+        3.9450772522386552
+      ],
+      "camera_center_world": [
+        3.398962270047007,
+        0.6835340434263679,
+        -2.29915441055627
+      ],
+      "source_jpeg": "/mnt/e/pgsr/data/truck-320/images/000001.jpg",
+      "run_camera_mapping_found": true,
+      "run_output_index": 0,
+      "render_rgb": "/mnt/e/pgsr/outputs/truck-densify1500/ours_1500/renders/00000.png",
+      "render_rgb_available": true,
+      "run_gt": "/mnt/e/pgsr/outputs/truck-densify1500/ours_1500/gt/00000.png",
+      "run_gt_available": true,
+      "source_jpeg_vs_run_gt": {
+        "compatible_shapes": true,
+        "mae_0_1": 0.0,
+        "rmse_0_1": 0.0,
+        "psnr_db": "infinity"
+      },
+      "render_rgb_vs_run_gt": {
+        "compatible_shapes": true,
+        "mae_0_1": 0.04770714044570923,
+        "rmse_0_1": 0.07342366874217987,
+        "psnr_db": 22.683278380111847
+      },
+      "mesh_color_vs_run_gt_all_pixels": {
+        "compatible_shapes": true,
+        "mae_0_1": 0.24378807842731476,
+        "rmse_0_1": 0.3685095012187958,
+        "psnr_db": 8.671026206372694
+      },
+      "mesh_color_vs_source_jpeg_all_pixels": {
+        "compatible_shapes": true,
+        "mae_0_1": 0.24378807842731476,
+        "rmse_0_1": 0.3685095012187958,
+        "psnr_db": 8.671026206372694
+      },
+      "mesh_color_vs_run_gt_on_hit_pixels": {
+        "pixels": 32191,
+        "mae_0_1_on_hit": 0.05999850854277611,
+        "rmse_0_1_on_hit": 0.09019739180803299,
+        "psnr_db_on_hit": 20.8961204109696
+      },
+      "mesh_vertices": 455965,
+      "mesh_triangles": 819553,
+      "vertex_color_min_rgb": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "vertex_color_max_rgb": [
+        1.0,
+        1.0,
+        1.0
+      ],
+      "hit_pixels": 32191,
+      "hit_fraction": 0.5651509831460674,
+      "depth_camera_z_min_max": [
+        1.970958948135376,
+        12.600571632385254
+      ],
+      "depth_visualization_percentiles_2_98": [
+        2.035586452484131,
+        10.544584465026857
+      ],
+      "depth_transform_max_abs_error": 2.1023245011519975e-06,
+      "artifacts": {
+        "mesh_vertex_color_png": "/mnt/e/pgsr/outputs/truck-densify1500/ours_1500/acceptance/mesh_camera/000001/mesh_vertex_color.png",
+        "hit_mask_png": "/mnt/e/pgsr/outputs/truck-densify1500/ours_1500/acceptance/mesh_camera/000001/hit_mask.png",
+        "depth_camera_z_npy": "/mnt/e/pgsr/outputs/truck-densify1500/ours_1500/acceptance/mesh_camera/000001/depth_camera_z.npy",
+        "depth_camera_z_png": "/mnt/e/pgsr/outputs/truck-densify1500/ours_1500/acceptance/mesh_camera/000001/depth_camera_z.png",
+        "world_hit_points_npy": "/mnt/e/pgsr/outputs/truck-densify1500/ours_1500/acceptance/mesh_camera/000001/world_hit_points.npy",
+        "contact_sheet_png": "/mnt/e/pgsr/outputs/truck-densify1500/ours_1500/acceptance/mesh_camera/000001/contact_sheet.png"
+      }
+    },
+    {
+      "colmap_image": "000126.jpg",
+      "colmap_image_id": 126,
+      "colmap_camera_id": 1,
+      "camera_model": "PINHOLE",
+      "resolution": [
+        320,
+        178
+      ],
+      "K": [
+        [
+          190.21027745001294,
+          0.0,
+          160.0
+        ],
+        [
+          0.0,
+          188.65069852237843,
+          89.0
+        ],
+        [
+          0.0,
+          0.0,
+          1.0
+        ]
+      ],
+      "world_to_camera_R": [
+        [
+          0.6815206595236684,
+          -0.03277003984398171,
+          0.731064781760856
+        ],
+        [
+          0.08695187534927809,
+          0.995546058620817,
+          -0.03643372802500779
+        ],
+        [
+          -0.7266147273594636,
+          0.08839779212842641,
+          0.6813346228771526
+        ]
+      ],
+      "world_to_camera_t": [
+        -2.2081179315385744,
+        -0.9692895109877728,
+        4.642909779537549
+      ],
+      "camera_center_world": [
+        4.962766153358243,
+        0.48218926616704844,
+        -1.5844127603922002
+      ],
+      "source_jpeg": "/mnt/e/pgsr/data/truck-320/images/000126.jpg",
+      "run_camera_mapping_found": true,
+      "run_output_index": 125,
+      "render_rgb": "/mnt/e/pgsr/outputs/truck-densify1500/ours_1500/renders/00125.png",
+      "render_rgb_available": true,
+      "run_gt": "/mnt/e/pgsr/outputs/truck-densify1500/ours_1500/gt/00125.png",
+      "run_gt_available": true,
+      "source_jpeg_vs_run_gt": {
+        "compatible_shapes": true,
+        "mae_0_1": 0.0,
+        "rmse_0_1": 0.0,
+        "psnr_db": "infinity"
+      },
+      "render_rgb_vs_run_gt": {
+        "compatible_shapes": true,
+        "mae_0_1": 0.08594410866498947,
+        "rmse_0_1": 0.13171207904815674,
+        "psnr_db": 17.60748789887974
+      },
+      "mesh_color_vs_run_gt_all_pixels": {
+        "compatible_shapes": true,
+        "mae_0_1": 0.2802494466304779,
+        "rmse_0_1": 0.40180569887161255,
+        "psnr_db": 7.919678157582036
+      },
+      "mesh_color_vs_source_jpeg_all_pixels": {
+        "compatible_shapes": true,
+        "mae_0_1": 0.2802494466304779,
+        "rmse_0_1": 0.40180569887161255,
+        "psnr_db": 7.919678157582036
+      },
+      "mesh_color_vs_run_gt_on_hit_pixels": {
+        "pixels": 31390,
+        "mae_0_1_on_hit": 0.08274998515844345,
+        "rmse_0_1_on_hit": 0.11416051536798477,
+        "psnr_db_on_hit": 18.84968158606603
+      },
+      "mesh_vertices": 455965,
+      "mesh_triangles": 819553,
+      "vertex_color_min_rgb": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "vertex_color_max_rgb": [
+        1.0,
+        1.0,
+        1.0
+      ],
+      "hit_pixels": 31390,
+      "hit_fraction": 0.5510884831460674,
+      "depth_camera_z_min_max": [
+        1.895105004310608,
+        12.822120666503906
+      ],
+      "depth_visualization_percentiles_2_98": [
+        1.9606726622581483,
+        11.004792919158936
+      ],
+      "depth_transform_max_abs_error": 2.1458545056418643e-06,
+      "artifacts": {
+        "mesh_vertex_color_png": "/mnt/e/pgsr/outputs/truck-densify1500/ours_1500/acceptance/mesh_camera/000126/mesh_vertex_color.png",
+        "hit_mask_png": "/mnt/e/pgsr/outputs/truck-densify1500/ours_1500/acceptance/mesh_camera/000126/hit_mask.png",
+        "depth_camera_z_npy": "/mnt/e/pgsr/outputs/truck-densify1500/ours_1500/acceptance/mesh_camera/000126/depth_camera_z.npy",
+        "depth_camera_z_png": "/mnt/e/pgsr/outputs/truck-densify1500/ours_1500/acceptance/mesh_camera/000126/depth_camera_z.png",
+        "world_hit_points_npy": "/mnt/e/pgsr/outputs/truck-densify1500/ours_1500/acceptance/mesh_camera/000126/world_hit_points.npy",
+        "contact_sheet_png": "/mnt/e/pgsr/outputs/truck-densify1500/ours_1500/acceptance/mesh_camera/000126/contact_sheet.png"
+      }
+    },
+    {
+      "colmap_image": "000251.jpg",
+      "colmap_image_id": 251,
+      "colmap_camera_id": 1,
+      "camera_model": "PINHOLE",
+      "resolution": [
+        320,
+        178
+      ],
+      "K": [
+        [
+          190.21027745001294,
+          0.0,
+          160.0
+        ],
+        [
+          0.0,
+          188.65069852237843,
+          89.0
+        ],
+        [
+          0.0,
+          0.0,
+          1.0
+        ]
+      ],
+      "world_to_camera_R": [
+        [
+          -0.9968800818714593,
+          -0.06577375480804752,
+          -0.04363388071675989
+        ],
+        [
+          -0.07674413766615203,
+          0.9369172881691479,
+          0.3410224808772124
+        ],
+        [
+          0.01845100815219291,
+          0.34330716320551896,
+          -0.9390419330306542
+        ]
+      ],
+      "world_to_camera_t": [
+        -0.22582621080685014,
+        -1.0585084489903613,
+        5.256072216094904
+      ],
+      "camera_center_world": [
+        -0.40333580095563726,
+        -0.8275658143975471,
+        5.2867937173095925
+      ],
+      "source_jpeg": "/mnt/e/pgsr/data/truck-320/images/000251.jpg",
+      "run_camera_mapping_found": true,
+      "run_output_index": 250,
+      "render_rgb": "/mnt/e/pgsr/outputs/truck-densify1500/ours_1500/renders/00250.png",
+      "render_rgb_available": true,
+      "run_gt": "/mnt/e/pgsr/outputs/truck-densify1500/ours_1500/gt/00250.png",
+      "run_gt_available": true,
+      "source_jpeg_vs_run_gt": {
+        "compatible_shapes": true,
+        "mae_0_1": 0.0,
+        "rmse_0_1": 0.0,
+        "psnr_db": "infinity"
+      },
+      "render_rgb_vs_run_gt": {
+        "compatible_shapes": true,
+        "mae_0_1": 0.09640949964523315,
+        "rmse_0_1": 0.14602063596248627,
+        "psnr_db": 16.711715288237862
+      },
+      "mesh_color_vs_run_gt_all_pixels": {
+        "compatible_shapes": true,
+        "mae_0_1": 0.43516790866851807,
+        "rmse_0_1": 0.5507132411003113,
+        "psnr_db": 5.181489628258231
+      },
+      "mesh_color_vs_source_jpeg_all_pixels": {
+        "compatible_shapes": true,
+        "mae_0_1": 0.43516790866851807,
+        "rmse_0_1": 0.5507132411003113,
+        "psnr_db": 5.181489628258231
+      },
+      "mesh_color_vs_run_gt_on_hit_pixels": {
+        "pixels": 21155,
+        "mae_0_1_on_hit": 0.09107111394405365,
+        "rmse_0_1_on_hit": 0.12507696449756622,
+        "psnr_db_on_hit": 18.056453344545254
+      },
+      "mesh_vertices": 455965,
+      "mesh_triangles": 819553,
+      "vertex_color_min_rgb": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "vertex_color_max_rgb": [
+        1.0,
+        1.0,
+        1.0
+      ],
+      "hit_pixels": 21155,
+      "hit_fraction": 0.3714009831460674,
+      "depth_camera_z_min_max": [
+        1.8466222286224365,
+        13.509195327758789
+      ],
+      "depth_visualization_percentiles_2_98": [
+        2.1016621494293215,
+        11.963207092285156
+      ],
+      "depth_transform_max_abs_error": 2.416103011881887e-06,
+      "artifacts": {
+        "mesh_vertex_color_png": "/mnt/e/pgsr/outputs/truck-densify1500/ours_1500/acceptance/mesh_camera/000251/mesh_vertex_color.png",
+        "hit_mask_png": "/mnt/e/pgsr/outputs/truck-densify1500/ours_1500/acceptance/mesh_camera/000251/hit_mask.png",
+        "depth_camera_z_npy": "/mnt/e/pgsr/outputs/truck-densify1500/ours_1500/acceptance/mesh_camera/000251/depth_camera_z.npy",
+        "depth_camera_z_png": "/mnt/e/pgsr/outputs/truck-densify1500/ours_1500/acceptance/mesh_camera/000251/depth_camera_z.png",
+        "world_hit_points_npy": "/mnt/e/pgsr/outputs/truck-densify1500/ours_1500/acceptance/mesh_camera/000251/world_hit_points.npy",
+        "contact_sheet_png": "/mnt/e/pgsr/outputs/truck-densify1500/ours_1500/acceptance/mesh_camera/000251/contact_sheet.png"
+      }
+    }
+  ],
+  "mapping_csv": "/mnt/e/pgsr/outputs/truck-densify1500/ours_1500/acceptance/mesh_camera/camera_mapping.csv"
+}

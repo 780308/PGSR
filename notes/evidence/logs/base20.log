@@ -1,0 +1,10 @@
+command: /mnt/e/PGSR/.envs/pgsr-1.0.0/bin/python scripts/study_driver.py pgsr.train -s /mnt/e/PGSR/data/truck-320 -d /mnt/e/PGSR/outputs/truck-base20 -i 20 --save_iterations 20 --mode base --backend gsplat --no_image_mask --no_depth_data
+seed=20260930 torch=2.4.1+cu121 cuda=12.1
+pgsr=1.0.0
+gaussian-splatting=2.8.4
+gsplat=1.5.3+pt24cu121
+open3d=0.19.0
+module=pgsr.train args=['-s', '/mnt/e/PGSR/data/truck-320', '-d', '/mnt/e/PGSR/outputs/truck-base20', '-i', '20', '--save_iterations', '20', '--mode', 'base', '--backend', 'gsplat', '--no_image_mask', '--no_depth_data']
+STUDY EXPERIMENT: bundled simple_knn lacks SM 86; Gaussian initialization uses exact CPU 3-neighbor mean squared distance. Initial scales may differ from the baseline CUDA approximation.
+Training:   0%|          | 0/20 [00:00<?, ?it/s]Training:   5%|▌         | 1/20 [00:01<00:34,  1.84s/it]Training:  10%|█         | 2/20 [00:01<00:14,  1.21it/s]Training:  25%|██▌       | 5/20 [00:02<00:03,  3.80it/s]Training:  40%|████      | 8/20 [00:02<00:01,  6.73it/s]Training:  40%|████      | 8/20 [00:02<00:01,  6.73it/s, epoch=0, loss=5.89, psnr=0, n=136029]Training:  60%|██████    | 12/20 [00:02<00:00, 11.13it/s, epoch=0, loss=5.89, psnr=0, n=136029]Training:  80%|████████  | 16/20 [00:02<00:00, 15.40it/s, epoch=0, loss=5.89, psnr=0, n=136029]Training:  80%|████████  | 16/20 [00:02<00:00, 15.40it/s, epoch=0, loss=6.44, psnr=0, n=136029]Training: 100%|██████████| 20/20 [00:04<00:00,  5.29it/s, epoch=0, loss=6.44, psnr=0, n=136029]Training: 100%|██████████| 20/20 [00:04<00:00,  4.98it/s, epoch=0, loss=6.44, psnr=0, n=136029]
+torch_peak_allocated_mib=378.0 torch_peak_reserved_mib=482.0

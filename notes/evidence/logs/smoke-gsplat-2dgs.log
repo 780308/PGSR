@@ -1,0 +1,77 @@
+STUDY EXPERIMENT: bundled simple_knn lacks SM 86; Gaussian initialization uses exact CPU 3-neighbor mean squared distance. Initial scales may differ from the baseline CUDA approximation.
+{
+  "backend": "gsplat-2dgs",
+  "seed": 20260930,
+  "initialization": "exact_cpu_3nn_study",
+  "cameras": 251,
+  "image_hw": [
+    178,
+    320
+  ],
+  "gaussians": 136029,
+  "outputs": {
+    "render": [
+      3,
+      178,
+      320
+    ],
+    "visibility_filter": [
+      105996,
+      1
+    ],
+    "radii": [
+      136029
+    ],
+    "gradient_2dgs": [
+      1,
+      136029,
+      2
+    ],
+    "render_distort": [
+      1,
+      178,
+      320,
+      1
+    ],
+    "render_median": [
+      1,
+      178,
+      320,
+      1
+    ],
+    "depth": [
+      1,
+      178,
+      320
+    ],
+    "invdepth": [
+      1,
+      178,
+      320
+    ],
+    "render_normals": [
+      3,
+      178,
+      320
+    ],
+    "render_alphas": [
+      1,
+      178,
+      320
+    ],
+    "rendered_distance": [
+      1,
+      178,
+      320
+    ],
+    "normals_from_depth": [
+      3,
+      178,
+      320
+    ]
+  },
+  "rgb_loss": 0.38493192195892334,
+  "parameter_tensors_with_grad": 6,
+  "nonzero_gradient_tensors": 5,
+  "peak_allocated_mib": 337.6
+}

@@ -1,0 +1,10 @@
+/.envs/
+/.cache/
+/data/
+/outputs/
+/upstream/
+/worktrees/
+/.vscode/
+/PGSR.pdf
+**/__pycache__/
+*.py[cod]

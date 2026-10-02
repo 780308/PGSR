@@ -1,0 +1,146 @@
+{
+  "schema_version": 1,
+  "generated_utc": "2026-10-01T07:04:14.296555+00:00",
+  "label": "PGSR Truck iteration 1500",
+  "purpose": "Qualitative visual inspection of a short, non-converged run; this is not a benchmark result.",
+  "converged": false,
+  "benchmark_result": false,
+  "status": "ready",
+  "run_directory": "/mnt/e/pgsr/outputs/truck-densify1500/ours_1500",
+  "selected_view": "00000",
+  "artifacts": {
+    "contact_sheet_png": "/mnt/e/pgsr/outputs/truck-densify1500/ours_1500/acceptance/visual_acceptance.png",
+    "metrics_json": "/mnt/e/pgsr/outputs/truck-densify1500/ours_1500/acceptance/visual_acceptance.json"
+  },
+  "images": {
+    "render": {
+      "path": "/mnt/e/pgsr/outputs/truck-densify1500/ours_1500/renders/00000.png",
+      "shape": [
+        178,
+        320,
+        3
+      ],
+      "dtype": "uint8",
+      "available": true
+    },
+    "gt": {
+      "path": "/mnt/e/pgsr/outputs/truck-densify1500/ours_1500/gt/00000.png",
+      "shape": [
+        178,
+        320,
+        3
+      ],
+      "dtype": "uint8",
+      "available": true
+    },
+    "invdepth": {
+      "path": "/mnt/e/pgsr/outputs/truck-densify1500/ours_1500/renders/00000_invdepth.tiff",
+      "shape": [
+        178,
+        320
+      ],
+      "dtype": "float32",
+      "finite_pixels": 56960,
+      "positive_finite_pixels": 56960,
+      "display_percentiles_2_98": [
+        0.027596944607794285,
+        0.4734062790870667
+      ],
+      "available": true
+    },
+    "normal": {
+      "path": "/mnt/e/pgsr/outputs/truck-densify1500/acceptance/geometry/00000_normal.png",
+      "shape": [
+        178,
+        320,
+        3
+      ],
+      "dtype": "uint8",
+      "available": true
+    },
+    "depth": {
+      "path": "/mnt/e/pgsr/outputs/truck-densify1500/acceptance/geometry/00000_depth.png",
+      "shape": [
+        178,
+        320
+      ],
+      "dtype": "uint8",
+      "finite_pixels": 56960,
+      "positive_finite_pixels": 35717,
+      "display_percentiles_2_98": [
+        24.0,
+        241.0
+      ],
+      "available": true
+    }
+  },
+  "rgb_comparison": {
+    "compatible_shapes": true,
+    "mae_0_1": 0.04770713672041893,
+    "rmse_0_1": 0.07342366129159927,
+    "psnr_db_selected_view": 22.683279261502346
+  },
+  "normal_note": "PGSR standard rendering writes RGB and inverse-depth TIFF only; an optional normal sample is included only when found under --geometry-dir.",
+  "meshes": {
+    "fuse.ply": {
+      "path": "/mnt/e/pgsr/outputs/truck-densify1500/ours_1500/fuse.ply",
+      "exists": true,
+      "vertices": 1348676,
+      "triangles": 1688137,
+      "finite_vertices": 1348676,
+      "finite_vertex_fraction": 1.0,
+      "all_vertex_coordinates_finite": true,
+      "finite_coordinates": 4046028,
+      "triangles_with_valid_indices": 1688137,
+      "triangles_with_finite_vertices": 1688137,
+      "bounds_min": [
+        -11.46484375,
+        -5.68359375,
+        -11.19140625
+      ],
+      "bounds_max": [
+        13.30078125,
+        8.61328125,
+        11.42578125
+      ],
+      "bounds_diagonal": 36.4592099038968,
+      "connected_components": null,
+      "connected_components_note": "skipped above safety limit (1688137 > 500000 faces)"
+    },
+    "fuse_post.ply": {
+      "path": "/mnt/e/pgsr/outputs/truck-densify1500/ours_1500/fuse_post.ply",
+      "exists": true,
+      "vertices": 455965,
+      "triangles": 819553,
+      "finite_vertices": 455965,
+      "finite_vertex_fraction": 1.0,
+      "all_vertex_coordinates_finite": true,
+      "finite_coordinates": 1367895,
+      "triangles_with_valid_indices": 819553,
+      "triangles_with_finite_vertices": 819553,
+      "bounds_min": [
+        -10.52734375,
+        -5.68359375,
+        -8.49609375
+      ],
+      "bounds_max": [
+        13.30078125,
+        7.71484375,
+        10.52734375
+      ],
+      "bounds_diagonal": 33.30448682645384,
+      "connected_components": null,
+      "connected_components_note": "skipped above safety limit (819553 > 500000 faces)"
+    }
+  },
+  "visualization": {
+    "mesh_views": [
+      "Front · XY",
+      "Side · ZY",
+      "Top · XZ"
+    ],
+    "maximum_triangles_drawn_per_mesh": 20000,
+    "connected_component_face_limit": 500000,
+    "projection": "CPU orthographic 2D painter projection with sampled faces; mesh metrics inspect full loaded arrays."
+  }
+}

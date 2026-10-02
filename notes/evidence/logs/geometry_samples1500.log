@@ -1,0 +1,65 @@
+{
+  "purpose": "短训练 checkpoint 的渲染几何验收；非论文收敛质量评价",
+  "command": [
+    "scripts/export_geometry_samples.py"
+  ],
+  "checkpoint": "/mnt/e/pgsr/outputs/truck-densify1500/point_cloud/iteration_1500/point_cloud.ply",
+  "source": "/mnt/e/pgsr/data/truck-320",
+  "max_depth": 10.0,
+  "samples": [
+    {
+      "camera_index": 0,
+      "image_name": "000001.jpg",
+      "image_hw": [
+        178,
+        320
+      ],
+      "valid_depth_pixels": 35717,
+      "valid_depth_fraction": 0.6270540730337079,
+      "finite_depth_fraction": 1.0,
+      "depth_p01_p50_p95": [
+        2.0231818771362304,
+        3.071237087249756,
+        8.056986618041991
+      ],
+      "alpha_p50": 0.997602105140686
+    },
+    {
+      "camera_index": 125,
+      "image_name": "000126.jpg",
+      "image_hw": [
+        178,
+        320
+      ],
+      "valid_depth_pixels": 41387,
+      "valid_depth_fraction": 0.7265976123595506,
+      "finite_depth_fraction": 1.0,
+      "depth_p01_p50_p95": [
+        1.9556839776039123,
+        3.3374547958374023,
+        7.7876169681549055
+      ],
+      "alpha_p50": 0.9868755340576172
+    },
+    {
+      "camera_index": 250,
+      "image_name": "000251.jpg",
+      "image_hw": [
+        178,
+        320
+      ],
+      "valid_depth_pixels": 39165,
+      "valid_depth_fraction": 0.6875877808988764,
+      "finite_depth_fraction": 1.0,
+      "depth_p01_p50_p95": [
+        1.5352241468429566,
+        3.9382989406585693,
+        6.262366962432861
+      ],
+      "alpha_p50": 0.9934606552124023
+    }
+  ],
+  "elapsed_seconds": 10.94,
+  "torch_peak_allocated_mib": 415.7,
+  "torch_peak_reserved_mib": 602.0
+}

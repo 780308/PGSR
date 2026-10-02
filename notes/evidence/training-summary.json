@@ -1,0 +1,89 @@
+{
+  "checkpoint": "/mnt/e/PGSR/outputs/truck-densify1500/point_cloud/iteration_1500/point_cloud.ply",
+  "checkpoint_bytes": 104962571,
+  "checkpoint_gaussians": 423230,
+  "initial_gaussians": 136029,
+  "final_logged_gaussians": 423230,
+  "selected_after_step_counts": {
+    "100": 136029,
+    "300": 136029,
+    "500": 139984,
+    "600": 156236,
+    "800": 206308,
+    "1000": 254494,
+    "1001": 254494,
+    "1200": 320900,
+    "1499": 423230,
+    "1500": 423230
+  },
+  "selected_loss_snapshots": [
+    {
+      "step": 100,
+      "pre_densification_gaussians": 136029,
+      "terms": {
+        "photometric": 0.2825886011123657,
+        "planar_total": 5.678987503051758,
+        "normal_total": 0.0,
+        "multiview_total": 0.000213623046875,
+        "virtual_total": 0.002521514892578125
+      }
+    },
+    {
+      "step": 101,
+      "pre_densification_gaussians": 136029,
+      "terms": {
+        "photometric": 0.28342488408088684,
+        "planar_total": 5.351649284362793,
+        "normal_total": 0.01631927490234375,
+        "multiview_total": 0.0,
+        "virtual_total": 0.0030460357666015625
+      }
+    },
+    {
+      "step": 300,
+      "pre_densification_gaussians": 136029,
+      "terms": {
+        "photometric": 0.11339175701141357,
+        "planar_total": 2.5334630012512207,
+        "normal_total": 0.01752924919128418,
+        "multiview_total": 0.00011754035949707031,
+        "virtual_total": 0.005269765853881836
+      }
+    },
+    {
+      "step": 500,
+      "pre_densification_gaussians": 136029,
+      "terms": {
+        "photometric": 0.09049634635448456,
+        "planar_total": 2.070307970046997,
+        "normal_total": 0.01740431785583496,
+        "multiview_total": 0.0005075931549072266,
+        "virtual_total": 0.00020241737365722656
+      }
+    },
+    {
+      "step": 1000,
+      "pre_densification_gaussians": 238327,
+      "terms": {
+        "photometric": 0.09272018074989319,
+        "planar_total": 0.584489107131958,
+        "normal_total": 0.015862226486206055,
+        "multiview_total": 0.007522642612457275,
+        "virtual_total": 0.0032353997230529785
+      }
+    },
+    {
+      "step": 1500,
+      "pre_densification_gaussians": 391324,
+      "terms": {
+        "photometric": 0.07796512544155121,
+        "planar_total": 0.1409233659505844,
+        "normal_total": 0.012150898575782776,
+        "multiview_total": 0.035034194588661194,
+        "virtual_total": 0.0010921955108642578
+      }
+    }
+  ],
+  "torch_peak_allocated_mib": 1284.7,
+  "torch_peak_reserved_mib": 1660.0
+}

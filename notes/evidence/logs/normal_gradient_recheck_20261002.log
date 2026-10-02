@@ -1,0 +1,9 @@
+{
+  "camera": "/mnt/e/PGSR/data/truck-320/images/000040.jpg",
+  "step": 101,
+  "enabled_loss": 2.6583237648010254,
+  "disabled_loss": 2.6408612728118896,
+  "isolated_normal_loss": 0.017462491989135742,
+  "xyz_grad_norm": 0.004385402891784906,
+  "xyz_nonzero_gradient_elements": 236166
+}

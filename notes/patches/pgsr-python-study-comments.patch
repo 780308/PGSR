@@ -1,0 +1,368 @@
+diff --git a/pgsr/gaussian_model.py b/pgsr/gaussian_model.py
+index b6fb1e0..4bf4f88 100644
+--- a/pgsr/gaussian_model.py
++++ b/pgsr/gaussian_model.py
+@@ -15,6 +15,7 @@ def render_normal(
+     scale: int = 1,
+ ) -> torch.Tensor:
+     """Render depth-derived normals in PGSR's [C, H, W] convention."""
++    # 输入 depth 为 [H,W] 的相机射线 z 深度；输出为 [3,H',W'] 的深度重建法线。
+     # Source: https://github.com/zju3dv/PGSR/blob/de24f1a38b350387e8d8fe381b2cd70c1ae946e7/gaussian_renderer/__init__.py#L21-L33
+     intrinsic_matrix = viewpoint_camera.K.to(device=depth.device, dtype=depth.dtype).clone()
+     intrinsic_matrix[0] /= scale
+@@ -42,8 +43,10 @@ def plane_params(
+     rotations: torch.Tensor,
+ ) -> torch.Tensor:
+     """Build camera-facing [normal.xyz, plane_distance] per Gaussian."""
++    # means3D/scales/rotations 都按 Gaussian 排列，输出 [N,4] 作为 rasterizer 的附加通道。
+     # https://github.com/zju3dv/PGSR/blob/de24f1a38b350387e8d8fe381b2cd70c1ae946e7/scene/gaussian_model.py#L145-L151
+     rotation_matrices = quaternion_to_matrix(F.normalize(rotations, dim=-1))
++    # 三个局部轴中最短的尺度轴代表扁平 Gaussian 的平面法线。
+     smallest_axis_idx = scales.argmin(dim=-1)[:, None, None].expand(-1, 3, 1)
+ 
+     # Source: https://github.com/zju3dv/PGSR/blob/de24f1a38b350387e8d8fe381b2cd70c1ae946e7/scene/gaussian_model.py#L153-L158
+@@ -54,6 +57,7 @@ def plane_params(
+     global_normal = torch.where(neg_mask, -global_normal, global_normal)
+ 
+     # https://github.com/zju3dv/PGSR/blob/de24f1a38b350387e8d8fe381b2cd70c1ae946e7/gaussian_renderer/__init__.py#L132-L133
++    # 将面向相机的世界系法线/中心变换到相机系，供每像素射线和平面求交。
+     local_normal = global_normal @ viewpoint_camera.world_view_transform[:3, :3]
+     pts_in_cam = means3D @ viewpoint_camera.world_view_transform[:3, :3] + viewpoint_camera.world_view_transform[3, :3]
+ 
+diff --git a/pgsr/mesh.py b/pgsr/mesh.py
+index 8f2a19e..7118f16 100644
+--- a/pgsr/mesh.py
++++ b/pgsr/mesh.py
+@@ -20,11 +20,13 @@ if __name__ == "__main__":
+     parser.add_argument("--no_image_mask", action="store_true")
+     parser.add_argument("-o", "--option", default=[], action="append", type=str)
+     args = parser.parse_args()
++    # 与 render.py 一样加载指定迭代的 Gaussian 状态，再交给依赖包的网格提取流程。
+     load_ply = os.path.join(args.destination, "point_cloud", f"iteration_{args.iteration}", "point_cloud.ply")
+     dataset, gaussians = prepare_rendering(
+         sh_degree=args.sh_degree, source=args.source, device=args.device,
+         trainable_camera=args.mode == "camera", load_ply=load_ply, load_camera=args.load_camera,
+         load_mask=not args.no_image_mask, load_depth=False, backend=args.backend,
+     )
++    # -o key=value 直接成为 extract_mesh() 的可选参数。
+     configs = {o.split("=", 1)[0]: eval(o.split("=", 1)[1]) for o in args.option}
+     extract_mesh(dataset, gaussians, os.path.join(args.destination, f"ours_{args.iteration}"), **configs)
+diff --git a/pgsr/models/gsplat.py b/pgsr/models/gsplat.py
+index 435e213..18b6d55 100644
+--- a/pgsr/models/gsplat.py
++++ b/pgsr/models/gsplat.py
+@@ -15,7 +15,7 @@ def render_plane(
+     render_alphas: torch.Tensor,
+     K: torch.Tensor,
+ ) -> tuple[torch.Tensor, torch.Tensor, torch.Tensor, torch.Tensor]:
+-    """Build PGSR normal, distance and ray-plane depth outputs."""
++    """把 alpha 合成的 [1,H,W,4] 平面图转成 [1,H,W] 深度及 [C,H,W] 辅助图。"""
+     # https://github.com/zju3dv/PGSR/blob/e83f5cb41a49cc512964af11a794502aaa32cc8d/submodules/diff-plane-rasterization/cuda_rasterizer/forward.cu#L303-L304
+     _, height, width, _ = out_all_map.shape
+     y, x = torch.meshgrid(
+@@ -32,6 +32,7 @@ def render_plane(
+         dim=-1,
+     )
+ 
++    # K 将像素中心坐标反投影为相机系射线 (x,y,1)；因此求出的 depth 是该射线的 z 参数。
+     rendered_normal = out_all_map[..., :3]
+     rendered_distance = out_all_map[..., 3:4]
+     # https://github.com/zju3dv/PGSR/blob/e83f5cb41a49cc512964af11a794502aaa32cc8d/submodules/diff-plane-rasterization/cuda_rasterizer/forward.cu#L404
+@@ -45,7 +46,7 @@ def render_plane(
+ 
+ 
+ class GsplatPGSRGaussianModel(GsplatGaussianModel):
+-    """PGSR geometry maps rendered as alpha-composited gsplat features."""
++    """继承 gsplat 的 Gaussian 参数/前向流程，并额外渲染 PGSR 平面几何图。"""
+ 
+     def __init__(self, sh_degree, render_depth_normal: bool = False):
+         super().__init__(sh_degree)
+@@ -71,6 +72,7 @@ class GsplatPGSRGaussianModel(GsplatGaussianModel):
+ 
+         Ks = viewpoint_camera.K.to(device=device, dtype=means3D.dtype)[None]
+ 
++        # 每个 Gaussian 生成相机系 normal.xyz + distance，形状 [N,4]。
+         input_all_map = plane_params(viewpoint_camera, means3D, scales, rotations)
+ 
+         camera_center = torch.linalg.inv(viewmats[0])[:3, 3]
+@@ -100,6 +102,7 @@ class GsplatPGSRGaussianModel(GsplatGaussianModel):
+         )
+ 
+         rendered_image = render_colors[0, ..., 0:3].permute(2, 0, 1)
++        # gsplat 输出按 [RGB(3), normal(3), distance(1)] 排列，批量维为 1。
+         out_all_map = render_colors[..., 3:7]
+ 
+         rendered_image = viewpoint_camera.postprocess(viewpoint_camera, rendered_image)
+@@ -114,6 +117,7 @@ class GsplatPGSRGaussianModel(GsplatGaussianModel):
+             pass
+ 
+         depth, rendered_normal, rendered_distance, render_alphas = render_plane(out_all_map, render_alphas, viewpoint_camera.K)
++        # 下游损失/多视图缓存读取这些字典键；RGB、深度和法线保持 [C,H,W] 布局。
+         plane_outputs = {
+             "depth": depth,
+             "invdepth": self.inverse_depth(depth),
+@@ -123,6 +127,7 @@ class GsplatPGSRGaussianModel(GsplatGaussianModel):
+         }
+         if self.render_depth_normal:
+             # https://github.com/zju3dv/PGSR/blob/de24f1a38b350387e8d8fe381b2cd70c1ae946e7/gaussian_renderer/__init__.py#L173-L175
++            # 深度重建法线用于一致性损失；alpha 的 detach 不阻断 depth -> normal 的梯度。
+             depth_normal = render_normal(viewpoint_camera, depth.squeeze(0)) * render_alphas.detach()
+             plane_outputs["normals_from_depth"] = depth_normal
+         return {
+diff --git a/pgsr/prepare.py b/pgsr/prepare.py
+index 33ddb14..d0be6ae 100644
+--- a/pgsr/prepare.py
++++ b/pgsr/prepare.py
+@@ -18,6 +18,7 @@ from .trainer import (
+ 
+ 
+ backends = ["gsplat", "gsplat-2dgs"]
++# mode 决定是否叠加相机优化和 densify/trim；是否从 PLY 续训还决定是否启用 SHLift。
+ basemodes = {
+     "base": PGSRTrainer,
+     "densify": PGSROpacityResetDensificationTrainer,
+@@ -33,6 +34,7 @@ shliftmodes = {
+ 
+ 
+ def get_gaussian_model_class(backend: str, trainable_camera: bool = False) -> Callable[[int], GaussianModel]:
++    """按 rasterizer 后端及相机是否可训练选择 GaussianModel 子类。"""
+     match backend:
+         case "gsplat":
+             from .models.gsplat import GsplatPGSRGaussianModel, CameraTrainableGsplatPGSRGaussianModel
+@@ -45,12 +47,14 @@ def get_gaussian_model_class(backend: str, trainable_camera: bool = False) -> Ca
+ 
+ 
+ def prepare_gaussians(sh_degree: int, source: str, device: str, trainable_camera: bool = False, load_ply: str = None, backend: str = "gsplat") -> GaussianModel:
++    """创建模型；有 PLY 时加载参数，否则用 COLMAP 点云初始化。"""
+     gaussians = get_gaussian_model_class(backend, trainable_camera=trainable_camera)(sh_degree).to(device)
+     gaussians.load_ply(load_ply) if load_ply else colmap_init(gaussians, source)
+     return gaussians
+ 
+ 
+ def prepare_trainer(gaussians: GaussianModel, dataset: CameraDataset, mode: str, load_ply: str = None, configs={}) -> AbstractTrainer:
++    """新建模型用 SHLift 逐步提升球谐阶数；加载 PLY 时直接用基础模式。"""
+     modes = basemodes if load_ply else shliftmodes
+     trainer = modes[mode](gaussians, dataset, **configs)
+     return trainer
+diff --git a/pgsr/render.py b/pgsr/render.py
+index c5c9bb1..673b713 100644
+--- a/pgsr/render.py
++++ b/pgsr/render.py
+@@ -15,6 +15,7 @@ def prepare_rendering(
+         sh_degree: int, source: str, device: str,
+         trainable_camera: bool = False, load_ply: str = None, load_camera: str = None,
+         load_mask=True, load_depth=True, backend: str = "gsplat") -> Tuple[CameraDataset, GaussianModel]:
++    """复用训练时的相机/模型准备流程，但不创建训练器。"""
+     dataset = prepare_dataset(source=source, device=device, trainable_camera=trainable_camera, load_camera=load_camera, load_mask=load_mask, load_depth=load_depth)
+     gaussians = prepare_gaussians(sh_degree=sh_degree, source=source, device=device, trainable_camera=trainable_camera, load_ply=load_ply, backend=backend)
+     return dataset, gaussians
+@@ -35,6 +36,7 @@ if __name__ == "__main__":
+     parser.add_argument("--no_rescale_depth_gt", action="store_true")
+     parser.add_argument("--save_depth_pcd", action="store_true")
+     args = parser.parse_args()
++    # 读取训练保存的 PLY；相机可选从 --load_camera 传入的文件恢复。
+     load_ply = os.path.join(args.destination, "point_cloud", "iteration_" + str(args.iteration), "point_cloud.ply")
+     save = os.path.join(args.destination, "ours_{}".format(args.iteration))
+     with torch.no_grad():
+@@ -42,4 +44,5 @@ if __name__ == "__main__":
+             sh_degree=args.sh_degree, source=args.source, device=args.device, trainable_camera=args.mode == "camera",
+             load_ply=load_ply, load_camera=args.load_camera,
+             load_mask=not args.no_image_mask, load_depth=args.save_depth_pcd, backend=args.backend)
++        # 渲染/深度点云的遍历与落盘由 gaussian_splatting.rendering() 实现。
+         rendering(dataset, gaussians, save, save_pcd=args.save_depth_pcd, rescale_depth_gt=not args.no_rescale_depth_gt)
+diff --git a/pgsr/train.py b/pgsr/train.py
+index 922c305..cec5ecc 100644
+--- a/pgsr/train.py
++++ b/pgsr/train.py
+@@ -18,6 +18,8 @@ def prepare_training(
+         trainable_camera: bool = False, load_ply: str = None, load_camera: str = None,
+         load_mask=True, load_depth=True, backend: str = "gsplat",
+         configs={}) -> Tuple[CameraDataset, GaussianModel, AbstractTrainer]:
++    """装配一次训练所需的数据集、Gaussian 状态和带 PGSR 损失的训练器。"""
++    # 数据集/相机解析来自 gaussian_splatting；PGSR 在 prepare.py 中选渲染后端和训练器包装层。
+     dataset = prepare_dataset(source=source, device=device, trainable_camera=trainable_camera, load_camera=load_camera, load_mask=load_mask, load_depth=load_depth)
+     gaussians = prepare_gaussians(sh_degree=sh_degree, source=source, device=device, trainable_camera=trainable_camera, load_ply=load_ply, backend=backend)
+     trainer = prepare_trainer(gaussians=gaussians, dataset=dataset, mode=mode, load_ply=load_ply, configs=configs)
+@@ -45,6 +47,7 @@ if __name__ == "__main__":
+     save_cfg_args(args.destination, args.sh_degree, args.source)
+     torch.autograd.set_detect_anomaly(False)
+ 
++    # -o key=value 的值会由 eval 解析，再按关键字传给训练器及其包装层。
+     configs = {o.split("=", 1)[0]: eval(o.split("=", 1)[1]) for o in args.option}
+     dataset, gaussians, trainer = prepare_training(
+         sh_degree=args.sh_degree, source=args.source, device=args.device, mode=args.mode, trainable_camera="camera" in args.mode,
+@@ -53,6 +56,7 @@ if __name__ == "__main__":
+         configs=configs)
+     dataset.save_cameras(os.path.join(args.destination, "cameras.json"))
+     torch.cuda.empty_cache()
++    # 相机采样、forward、loss/backward、优化器更新及保存循环均由依赖包的 training() 驱动。
+     training(
+         dataset=dataset, gaussians=gaussians, trainer=trainer,
+         destination=args.destination, iteration=args.iteration, save_iterations=args.save_iterations,
+diff --git a/pgsr/trainer/combinations.py b/pgsr/trainer/combinations.py
+index 92728d3..517d175 100644
+--- a/pgsr/trainer/combinations.py
++++ b/pgsr/trainer/combinations.py
+@@ -23,6 +23,8 @@ def PGSRTrainerWrapper(
+         base_trainer_constructor: Callable[..., AbstractTrainer],
+         model: GaussianModel, dataset: CameraDataset, *args,
+         **configs) -> AbstractTrainer:
++    """将平面尺度、深度法线、多视图和虚拟相机约束包在基础训练器外。"""
++    # partial 每次把上一个构造器包入新构造器；最外层为 VirtualCameraReprojectionTrainerWrapper。
+     base_trainer_constructor = partial(PlanarScaleTrainerWrapper, base_trainer_constructor)
+     base_trainer_constructor = partial(DepthNormalConsistencyTrainerWrapper, base_trainer_constructor)
+     base_trainer_constructor = partial(MultiViewPhotometricGeometricTrainerWrapper, base_trainer_constructor)
+@@ -39,6 +41,7 @@ def BasePGSRCameraTrainer(model: GaussianModel, dataset: TrainableCameraDataset,
+ 
+ 
+ def MultiViewTrimOpacityResetDensificationTrainerWrapper(model: GaussianModel, dataset: CameraDataset, **configs):
++    # densify 模式额外组合多视图 trimming、densification 与不透明度重置。
+     return OpacityResetTrainerWrapper(BaseMultiViewTrimDensificationTrainer, model, dataset, **configs)
+ 
+ 
+@@ -60,6 +63,7 @@ def BaseSHLiftPGSRTrainer(
+         sh_degree_up_interval=1000,
+         initial_sh_degree=0,
+         **configs):
++    # 从 COLMAP 初始化时，SHLifter 按间隔增加球谐阶数；基础 loss 仍由包装链提供。
+     return SHLifter(
+         BasePGSRTrainer(model, dataset, **configs),
+         sh_degree_up_interval=sh_degree_up_interval,
+diff --git a/pgsr/trainer/depth_normal_consistency.py b/pgsr/trainer/depth_normal_consistency.py
+index e4fc982..03ed5a6 100644
+--- a/pgsr/trainer/depth_normal_consistency.py
++++ b/pgsr/trainer/depth_normal_consistency.py
+@@ -10,6 +10,7 @@ from ..utils import get_img_grad_weight
+ 
+ 
+ class DepthNormalConsistencyTrainer(TrainerWrapper):
++    """在基础损失上加入渲染平面法线与深度重建法线的一致性项。"""
+ 
+     def __init__(
+             self,
+@@ -22,6 +23,7 @@ class DepthNormalConsistencyTrainer(TrainerWrapper):
+         self.depth_normal_consistency_weight = depth_normal_consistency_weight
+         self.depth_normal_consistency_from_iter = depth_normal_consistency_from_iter
+         self.depth_normal_consistency_edge_aware = depth_normal_consistency_edge_aware
++        # 让模型在 forward 的输出字典中生成 normals_from_depth。
+         self.model.render_depth_normal = True
+ 
+     def loss(self, out: dict, camera: Camera) -> torch.Tensor:
+@@ -32,6 +34,7 @@ class DepthNormalConsistencyTrainer(TrainerWrapper):
+             )
+ 
+         loss = super().loss(out, camera)
++        # 从迭代阈值之后才加约束；等于阈值的那一步仍返回基础损失。
+         if self.curr_step <= self.depth_normal_consistency_from_iter:
+             return loss
+ 
+@@ -40,6 +43,7 @@ class DepthNormalConsistencyTrainer(TrainerWrapper):
+         normal = out["render_normals"]
+         depth_normal = out["normals_from_depth"]
+ 
++        # 两种法线都是 [3,H,W]；图像梯度权重 [H,W] 抑制边缘处的不可靠比较。
+         image_weight = (1.0 - get_img_grad_weight(camera.ground_truth_image))
+         image_weight = (image_weight).clamp(0, 1).detach() ** 2
+         if self.depth_normal_consistency_edge_aware:
+diff --git a/pgsr/trainer/multi_view/trainer.py b/pgsr/trainer/multi_view/trainer.py
+index b55154e..e6ff7bd 100644
+--- a/pgsr/trainer/multi_view/trainer.py
++++ b/pgsr/trainer/multi_view/trainer.py
+@@ -16,6 +16,7 @@ from .abc import AbstractMultiViewRegularizer
+ 
+ @dataclass(frozen=True)
+ class CameraCache:
++    """保存一次渲染的相机参数和降采样深度，供邻视角筛选复用。"""
+     K: torch.Tensor
+     R_c2w: torch.Tensor
+     T_c2w: torch.Tensor
+@@ -31,6 +32,7 @@ class CameraCache:
+         K = camera.K.detach().clone()
+         K[:2] *= scale_factor
+         c2w = torch.linalg.inv(camera.world_view_transform.detach())
++        # 缓存与训练图分离；深度缩放后，K 的前两行按同一比例调整。
+         depth = depth.detach().squeeze()[None, None]
+         if scale_factor != 1:
+             depth = F.interpolate(
+@@ -59,6 +61,7 @@ class CameraCache:
+             indexing="ij",
+         )
+         pixels = torch.stack((x, y), dim=-1)
++        # 有效像素 [M,2] + 深度 [M] -> 世界系 xyz [M,3]。
+         return reconstruct_pixels(
+             K=self.K, R_c2w=self.R_c2w, T_c2w=self.T_c2w,
+             pixels=pixels[valid], depth=self.depth[valid],
+@@ -80,6 +83,7 @@ class CameraCache:
+ 
+ 
+ class MultiViewRegularizationTrainer(TrainerWrapper):
++    """缓存各视角深度，以重投影可见点数量选邻居并计算多视图正则。"""
+ 
+     def __init__(
+             self,
+@@ -124,6 +128,7 @@ class MultiViewRegularizationTrainer(TrainerWrapper):
+ 
+         candidate_indices = []
+         visible_counts = []
++        # 将参考相机重建的世界点投到候选视角，并与候选缓存深度比对。
+         for candidate_idx, candidate_cache in tqdm(
+                 enumerate(self.camera_cache),
+                 total=len(self.camera_cache),
+@@ -162,6 +167,7 @@ class MultiViewRegularizationTrainer(TrainerWrapper):
+     def loss(self, out: dict, camera: Camera) -> torch.Tensor:
+         loss = super().loss(out, camera)
+         camera_idx = self.camera_indices[camera.ground_truth_image_path]
++        # 每次见到当前相机时更新缓存；此步骤即使尚未进入正则区间也执行。
+         with torch.no_grad():
+             self.camera_cache[camera_idx] = CameraCache.from_camera(
+                 camera, out["depth"],
+@@ -170,11 +176,13 @@ class MultiViewRegularizationTrainer(TrainerWrapper):
+         if not self.multi_view_regularize_from_iter <= self.curr_step <= self.multi_view_regularize_until_iter:
+             return loss
+         if (self.curr_step - self.multi_view_regularize_from_iter) % self.neighbor_view_update_interval == 0:
++            # 邻居列表不是每步重算，而是在设定间隔用目前已缓存的视角更新。
+             with torch.no_grad():
+                 self.update_nearest_cameras()
+         if len(self.nearest_indices[camera_idx]) == 0:
+             return loss
+         nearest_camera = self.dataset[random.choice(self.nearest_indices[camera_idx])]._replace(bg_color=camera.bg_color)
++        # 邻视角再次 forward 保留梯度；regularizer 叠加几何/光度重投影损失。
+         nearest_out = self.model(nearest_camera)
+         return loss + self.regularizer.regularize(out, camera, nearest_out, nearest_camera, self.curr_step)
+ 
+diff --git a/pgsr/trainer/trim/trainer.py b/pgsr/trainer/trim/trainer.py
+index 4c5fb67..58bdb6c 100644
+--- a/pgsr/trainer/trim/trainer.py
++++ b/pgsr/trainer/trim/trainer.py
+@@ -14,6 +14,7 @@ from gaussian_splatting.trainer import (
+ 
+ 
+ class MultiViewTrimmer(DensifierWrapper):
++    """按多相机可见次数产生布尔裁剪掩码，交给外层 densification 流程处理。"""
+ 
+     def __init__(
+             self,
+@@ -32,6 +33,7 @@ class MultiViewTrimmer(DensifierWrapper):
+         self.trim_observe_threshold = trim_observe_threshold
+ 
+     def trim_mask(self) -> torch.Tensor:
++        # observe_count 长度是当前 Gaussian 个数；visibility_filter 是渲染器的可见索引。
+         observe_count = torch.zeros(self.model.get_xyz.shape[0], device=self.model.get_xyz.device, dtype=torch.int32)
+         for camera_idx in tqdm(range(len(self.dataset)), total=len(self.dataset), desc="Multi-view trim", leave=False, position=1):
+             with torch.no_grad():
+@@ -41,6 +43,7 @@ class MultiViewTrimmer(DensifierWrapper):
+ 
+     def densify_and_prune(self, loss, out, camera, step: int) -> DensificationInstruct:
+         ret = super().densify_and_prune(loss, out, camera, step)
++        # 与底层 densifier 的 remove_mask 求并集；此处只构造指令，不直接改参数。
+         if self.trim_from_iter <= step < self.trim_until_iter and step % self.trim_interval == 0:
+             trim_mask = self.trim_mask()
+             remove_mask = trim_mask if ret.remove_mask is None else torch.logical_or(ret.remove_mask, trim_mask)
+@@ -58,6 +61,7 @@ def MultiViewTrimmerDensifierWrapper(
+         trim_interval: int = 1000,
+         trim_observe_threshold: int = 2,
+         **configs) -> MultiViewTrimmer:
++    # 未单独指定裁剪终点时，与 densify 的终点保持一致。
+     if trim_until_iter is None:
+         trim_until_iter = configs.get("densify_until_iter", 15000)
+     return MultiViewTrimmer(
