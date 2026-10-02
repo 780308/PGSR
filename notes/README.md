@@ -9,7 +9,7 @@
 | 一张图怎样进入 Gaussian、渲染、loss 和反向？ | [张量与数据通路](tensor_trace.md)、[论文—代码地图](source_map.md) |
 | `pgsr` 与官方实现有哪些重要差异？ | [整合审计](library_audit.md) |
 | 环境和 CPU 3-NN workaround 怎样影响实验？ | [环境记录](environment_setup.md)、[pip 版本快照](environment_pip_freeze_20261001.txt)、[Conda 版本快照](environment_conda_explicit_20261001.txt) |
-| PLY、渲染深度如何生成网格，实际质量如何？ | [渲染与网格验收](mesh_acceptance.md)、[可视化验收用法](visualization_usage.md)、[离线查看器用法](interactive_viewer.md) |
+| PLY、渲染深度如何生成网格，实际质量如何？ | [Truck 碎片网格诊断与 3DGS 对比边界](truck_reconstruction_diagnosis.md)、[渲染与网格链路验收](mesh_acceptance.md)、[可视化验收用法](visualization_usage.md)、[离线查看器用法](interactive_viewer.md) |
 | Git 中保存了哪些可复核的紧凑证据？ | [实验产物与证据清单](artifact_manifest.md)、`evidence/` |
 
 优先核对 Git 内的[证据清单](artifact_manifest.md)及其 SHA-256，再看[数据准备清单](evidence/truck-preparation-manifest.json)、[训练摘要](evidence/training-summary.json)、[三帧平面深度](evidence/geometry-manifest.json)、[法线梯度重检原始日志](evidence/logs/normal_gradient_recheck_20261002.log)、[网格结构验收](evidence/visual-acceptance.json)与[相机投影验收](evidence/mesh-camera/summary.json)。`evidence/logs/` 还保存 S01–S06 的原始日志与损失 trace；其中 `geometry300.jsonl` 的法线列已知由插桩错误污染，应以重检日志为准。`outputs/` 保留原件；训练/渲染/网格由 `../scripts/run_local_study.sh` 启动，实际展开命令见 Git 内对应训练日志首行。

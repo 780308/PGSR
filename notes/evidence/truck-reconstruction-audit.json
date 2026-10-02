@@ -1,0 +1,110 @@
+{
+  "method": "Open3D 共边三角面连通片；NumPy 默认线性分位数；边界边为引用一次的无向边",
+  "image_metrics": {
+    "view_count": 251,
+    "metrics": {
+      "psnr": {
+        "mean": 19.541453403305724,
+        "std_population": 1.5168186361523968,
+        "quantiles_linear_0_10_25_50_75_90_100": [
+          12.903854370117188,
+          17.777523040771484,
+          18.60360336303711,
+          19.514814376831055,
+          20.50006103515625,
+          21.680438995361328,
+          23.250389099121094
+        ],
+        "below_20_db": 165
+      },
+      "ssim": {
+        "mean": 0.717102301310733,
+        "std_population": 0.04614255646766661,
+        "quantiles_linear_0_10_25_50_75_90_100": [
+          0.532095193862915,
+          0.6631731986999512,
+          0.6855263113975525,
+          0.7178668975830078,
+          0.7434057891368866,
+          0.7852779626846313,
+          0.8335908055305481
+        ]
+      },
+      "lpips": {
+        "mean": 0.1777679903276888,
+        "std_population": 0.045346190574997836,
+        "quantiles_linear_0_10_25_50_75_90_100": [
+          0.07538829743862152,
+          0.11405453830957413,
+          0.14983856678009033,
+          0.17455986142158508,
+          0.20822161436080933,
+          0.2354762852191925,
+          0.30860888957977295
+        ]
+      }
+    }
+  },
+  "meshes": {
+    "fuse.ply": {
+      "file": "/mnt/e/PGSR/outputs/truck-densify1500/ours_1500/fuse.ply",
+      "vertices": 1348676,
+      "triangles": 1688137,
+      "edge_connected_components": 130180,
+      "component_faces_median": 4.0,
+      "component_faces_p90": 12.0,
+      "component_faces_p99": 53.0,
+      "largest_component_faces": 229742,
+      "largest_component_face_fraction": 0.1360920351843482,
+      "second_component_faces": 205379,
+      "components_under_100_faces": 129615,
+      "faces_in_components_under_100": 747288,
+      "total_area_scene_units_squared": 717.4839899289647,
+      "boundary_edges": 752307,
+      "unique_edges": 2908359,
+      "boundary_edge_fraction": 0.2586706111590763,
+      "nonmanifold_edges": 0,
+      "zero_area_triangles": 0,
+      "bounds_min": [
+        -11.46484375,
+        -5.68359375,
+        -11.19140625
+      ],
+      "bounds_max": [
+        13.30078125,
+        8.61328125,
+        11.42578125
+      ]
+    },
+    "fuse_post.ply": {
+      "file": "/mnt/e/PGSR/outputs/truck-densify1500/ours_1500/fuse_post.ply",
+      "vertices": 455965,
+      "triangles": 819553,
+      "edge_connected_components": 50,
+      "component_faces_median": 3318.5,
+      "component_faces_p90": 21893.00000000001,
+      "component_faces_p99": 217804.12999999995,
+      "largest_component_faces": 229742,
+      "largest_component_face_fraction": 0.28032598257830793,
+      "second_component_faces": 205379,
+      "components_under_100_faces": 0,
+      "faces_in_components_under_100": 0,
+      "total_area_scene_units_squared": 419.72222364801314,
+      "boundary_edges": 108267,
+      "unique_edges": 1283463,
+      "boundary_edge_fraction": 0.08435537292465774,
+      "nonmanifold_edges": 0,
+      "zero_area_triangles": 0,
+      "bounds_min": [
+        -10.52734375,
+        -5.68359375,
+        -8.49609375
+      ],
+      "bounds_max": [
+        13.30078125,
+        7.71484375,
+        10.52734375
+      ]
+    }
+  }
+}

@@ -1,5 +1,7 @@
 # PGSR Python 库 Truck-320 本地学习实验总结
 
+2026-10-02 追加的 [S07 碎片网格诊断](truck_reconstruction_diagnosis.md) 已用完整 PLY 证实严重碎片化。以下 S01–S06 的“执行链路通过、网格非空”只代表流程验收；**Truck 物体级 mesh 质量不通过**，不能把局部相机视角能辨出车体理解为完整重建。
+
 实验日期：2026-09-30 至 2026-10-02（Asia/Shanghai；10-02 对法线梯度做了固定 checkpoint 重检）。本页是这轮实验的入口；精确日志、张量表、论文—代码对应关系和网格验收分别保留在 [`experiment_log.md`](experiment_log.md)、[`tensor_trace.md`](tensor_trace.md)、[`source_map.md`](source_map.md) 和 [`mesh_acceptance.md`](mesh_acceptance.md)，适合 Git 的紧凑证据见 [`artifact_manifest.md`](artifact_manifest.md)。下文的“观察”均指已经运行且有日志或产物支持；源码解释与后续设想另行标明。
 
 ## 目标、结论和范围

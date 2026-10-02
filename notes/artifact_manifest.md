@@ -6,7 +6,7 @@
 
 ## 纳入 Git 的紧凑证据包
 
-证据包共 21 个文件、3,454,593 bytes（约 3.29 MiB），低于 5 MiB 目标。所有文件均从对应原件逐字节复制，并已用 SHA-256 核对副本与原件一致。
+初始证据包共 21 个文件、3,454,593 bytes（约 3.29 MiB），低于 5 MiB 目标。下表及后面的日志表所列初始文件均从对应原件逐字节复制，并已用 SHA-256 核对副本与原件一致。2026-10-02 追加了 1 份由已保留原件重新统计得到的 CPU 审计 JSON，见下一节；它不是原有文件的逐字节副本。
 
 | Git 路径 | 原始路径 | 内容 | bytes | SHA-256 |
 | --- | --- | --- | ---: | --- |
@@ -24,6 +24,19 @@
 三张联系表是学习验收用的可视化抽样，含 INRIA `tandt_db.zip` 中 Truck 场景经本项目缩放后的原始/GT 帧，以及本地渲染、命中 mask、mesh 顶点色投影和相机 Z 深度。上游数据来源为 `https://repo-sam.inria.fr/fungraph/3d-gaussian-splatting/datasets/input/tandt_db.zip`；将这些抽样放入 Git 不代表完整 Truck 图像集或完整数据包已纳入仓库。
 
 这些副本保留了生成时写入的绝对 WSL 路径；路径用于追溯原始运行位置，换机阅读 JSON 时不应把它们当作当前有效路径。
+
+### S07 追加：训练视角质量与全量网格拓扑审计
+
+2026-10-02 为检验“HTML 看起来有车、全局 mesh 却碎裂”这一观察，在原有 `render-quality.csv`、`fuse.ply`、`fuse_post.ply` 上执行 CPU 只读统计。新证据 `notes/evidence/truck-reconstruction-audit.json` 为 **3,317 bytes**，SHA-256 为 `8d906a9072e2736c275071b7d0abe7f8f358887481c70e35a062a8497bcff10f`。其输入 PLY 的 SHA-256 已在本清单“大体积产物”表中列出；环境为 WSL Conda `pgsr-1.0.0`、Open3D 0.19.0，运行没有使用 GPU，也没有重新训练。复算脚本为 `scripts/audit_truck_reconstruction.py`，解释见 `notes/truck_reconstruction_diagnosis.md`。
+
+```bash
+.envs/pgsr-1.0.0/bin/python scripts/audit_truck_reconstruction.py \
+  --quality-csv notes/evidence/render-quality.csv \
+  --mesh-dir outputs/truck-densify1500/ours_1500 \
+  --output notes/evidence/truck-reconstruction-audit.json
+```
+
+新增统计与初始证据包合计 22 个文件、3,457,910 bytes；上述输入和命令可在本机原件仍在时复算。S07 的实测结论是 251 个训练视角平均 PSNR `19.54145 dB`，原始网格共边连通片 `130,180` 个、最大连通片占 `13.61%` 三角面；它不包含 vanilla 3DGS 或留出视角对照。
 
 ### 纳入 Git 的原始运行日志
 
