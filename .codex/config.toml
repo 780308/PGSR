@@ -1,31 +1,15 @@
-# .codex/config.toml - PGSR Local Learning Workspace
-#
-# IMPORTANT DESIGN CHOICE
-# Do NOT pin the root `model` or root `model_reasoning_effort` here.
-# This keeps the user's model/effort selection in the interactive UI usable,
-# especially when the user explicitly requests single-agent mode.
-#
-# Default orchestration policy is multi-agent. AGENTS.md defines the routing:
-# - architecture / top-level design / global audit -> gpt-6-sol, xhigh
-# - execution / tracing / implementation -> gpt-6-luna, xhigh
-# - mechanical I/O / formatting / text emission -> gpt-5.6-sol, xhigh
-#
-# `xhigh` is the Codex configuration value corresponding to Extra High.
-# If the user says not to use subagents, the root agent must simply avoid
-# spawning agents and use the model/effort selected in the UI.
+# PGSR 本地学习工作区的模型分工。
+# 主线程负责顶层规划、研究设计和最终审计；用户在当前会话中的显式模型选择仍可覆盖本文件。
+model = "gpt-6-astra"
+model_reasoning_effort = "medium"
+
 [agents]
 enabled = true
 max_concurrent_threads_per_session = 3
-max_depth = 1
 interrupt_message = true
-default_subagent_model = "gpt-6-luna"
-default_subagent_reasoning_effort = "xhigh"
-[agents.architect]
-description = "Top-level PGSR learning design, paper-to-code decomposition, experiment design, and global audit. When spawning this role, explicitly select gpt-6-sol with xhigh reasoning."
-nickname_candidates = ["architect", "auditor"]
-[agents.executor]
-description = "Detailed source tracing, debugger-oriented investigation, implementation, short experiment preparation, and evidence collection. Default to gpt-6-luna with xhigh reasoning."
-nickname_candidates = ["tracer", "executor"]
-[agents.mechanical]
-description = "Mechanical file I/O, repetitive formatting, log collation, path cleanup, and final text emission after technical structure is fixed. When spawning this role, explicitly select gpt-5.6-sol with xhigh reasoning."
-nickname_candidates = ["scribe", "operator"]
+# 未指定角色时，以中间执行层为子代理默认值。
+default_subagent_model = "gpt-6.1-sol"
+default_subagent_reasoning_effort = "medium"
+
+# 固定角色模型见 .codex/agents/{architect,executor,mechanical}.toml。
+# 顶层：GPT-6 Astra Medium；执行层：GPT-6.1 Sol Medium；机械层：GPT-6 Sol Medium。

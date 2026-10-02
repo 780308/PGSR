@@ -105,18 +105,15 @@ Maintain at least 20-30 GB of free disk headroom so local experiments and packag
 Use subagents by default for non-trivial tasks. The root agent is the coordinator and must route work intentionally rather
 than spawning agents indiscriminately.
 Routing policy:
-- Top-level design, research strategy, architecture decisions, experiment design, and final global audit: use GPT-6 Sol with
-`xhigh` reasoning.
-- Execution work, code tracing, implementation, experiment preparation, and detailed evidence collection: use GPT-6 Luna
-with `xhigh` reasoning.
-- Simple file I/O, mechanical transformations, repetitive formatting, log collation, and final text emission when the
-structure is already fixed: use GPT-5.6 Sol with `xhigh` reasoning.
+- Top-level design, research strategy, architecture decisions, experiment design, and final global audit: use GPT-6 Astra with `medium` reasoning.
+- Execution work, code tracing, implementation, experiment preparation, and detailed evidence collection: use GPT-6.1 Sol with `medium` reasoning.
+- Simple file I/O, mechanical transformations, repetitive formatting, log collation, and final text emission when the structure is already fixed: use GPT-6 Sol with `medium` reasoning.
+The root model and default subagent model are set in `.codex/config.toml`; fixed role models are set in `.codex/agents/{architect,executor,mechanical}.toml`.
 Example for an experiment report or data-flow report:
-1. GPT-6 Sol defines the outline, claims to verify, and acceptance criteria.
-2. GPT-6 Luna fills the outline with code evidence, commands, tensors, experiment observations, and implementation details.
-3. GPT-5.6 Sol performs mechanical consolidation, formatting, cross-reference cleanup, and final text emission without
-changing technical conclusions.
-4. GPT-6 Sol performs a final global consistency audit when the report is technically consequential.
+1. GPT-6 Astra defines the outline, claims to verify, and acceptance criteria.
+2. GPT-6.1 Sol fills the outline with code evidence, commands, tensors, experiment observations, and implementation details.
+3. GPT-6 Sol performs mechanical consolidation, formatting, cross-reference cleanup, and final text emission without changing technical conclusions.
+4. GPT-6 Astra performs a final global consistency audit when the report is technically consequential.
 Do not use multiple agents when the task is trivial enough that delegation would cost more context than it saves.
 ## User Override: Single-Agent Mode
 If the user says "do not use subagents", "single model only", "no delegation", or any equivalent instruction, do not spawn
